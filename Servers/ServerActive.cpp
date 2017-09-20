@@ -16,7 +16,6 @@ int main()
 {
     int portNo = 8080, ClientSocket;
     socklen_t len; //store size of the address
-    bool loop = false;
     struct sockaddr_in serverAddress, clientAddress;
 
 
