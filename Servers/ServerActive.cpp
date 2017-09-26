@@ -4,6 +4,8 @@
 #include <netdb.h>
 #include <iostream>
 #include <sys/socket.h>
+#include <string>
+#include "Memory.h"
 
 using namespace std;
 
@@ -11,9 +13,9 @@ void *task1(void *);
 
 static int ServerSocket;
 const int ThreadUsable = 3;
+static Memory<int> memory;
 
-int main()
-{
+int main() {
     int portNo = 8080, ClientSocket;
     socklen_t len; //store size of the address
     struct sockaddr_in serverAddress, clientAddress;
@@ -75,25 +77,33 @@ int main()
         pthread_join(threadA[i], NULL);
     }
 
-
+    return 0;
 }
 
-void *task1 (void *dummyPt)
-{
+void *task1 (void *dummyPt) {
     cout << "Thread No: " << pthread_self() << endl;
-    char test[300];
     bool loop = false;
     while(!loop)
     {
-        read(ServerSocket, test, 300);
+        char test[100];
+        recv(ServerSocket, test, 100,0);
 
         string tester (test);
         cout << tester << endl;
 
+        if(tester.compare(0,15,"esta disponible") == 0){
+            cout << "Si estoy disponible" << endl;
+        }
+        if(tester.compare(0,9,"ya me voy") == 0){
+            cout << "Llevese esta" << endl;
+        }
 
-        if(tester == "exit")
-            break;
+        if(tester.compare(0,4,"rm_exit") == 0) {
+            cout << "Hasta pronto" << endl;
+            loop = true;
+        }
     }
     cout << "\nClosing thread and conn" << endl;
     close(ServerSocket);
 }
+

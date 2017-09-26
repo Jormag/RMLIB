@@ -17,21 +17,24 @@
 using namespace std;
 
 template <class T>
-
-class list {
+class linkedList {
 public:
-    list();
-    ~list();
+    linkedList();
+
+    ~linkedList();
+
+    Node<T> *first;
+    int size;
 
     void add_end(T);
-    void del_by_data(T);
-    void del_by_position(int);
-    void print();
-    void search(T);
 
-private:
-    Node<T> *m_head;
-    int m_num_nodes;
+    void del_by_data(T);
+
+    void del_by_position(int);
+
+    void print();
+
+    void search(T);
 };
 
 
