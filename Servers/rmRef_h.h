@@ -13,7 +13,7 @@ template <class T>
 class rmRef_h {
 public:
     rmRef_h();
-    rmRef_h(const char*,T,int);
+    void printValues();
     ~rmRef_h();
 
     rmRef_h* next;

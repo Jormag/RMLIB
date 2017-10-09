@@ -7,7 +7,6 @@
 #include <sys/socket.h>
 #include "Memory.cpp"
 
-enum Commands {RM_NEW, RM_GET, RM_DELETE,RM_EXIT};
 
 using namespace std;
 
@@ -16,7 +15,7 @@ void print();
 
 static int ServerSocket;
 const bool active = true;
-Memory<const char*> memory;
+Memory<char*> memory;
 
 int portNo,portA, portP, ClientSocket, type;
 char* ip;
@@ -47,7 +46,7 @@ int main() {
     }
 
     inUse = false;
-    memory = Memory<const char*>();
+    memory = Memory<char*>();
 
     socklen_t len; //store size of the address
     struct sockaddr_in serverAddress, clientAddress;
@@ -105,15 +104,6 @@ int main() {
         print();
     }
 
-    /*
-    for(int i = 0; i < active; i++)
-    {
-        pthread_join(threadA[i], NULL);
-    }
-     */
-
-    //memory.ram.print();
-
     return 0;
 }
 
@@ -123,7 +113,7 @@ void print(){
 }
 
 void* task1 (void *dummyPt) {
-    if (inUse == false){
+    if (!inUse){
         inUse = true;
     }else{
         while(inUse){
@@ -136,6 +126,8 @@ void* task1 (void *dummyPt) {
     recv(ServerSocket, test, 30, 0);
     string tester(test);
 
+    cout << tester << endl;
+
     if (tester.size() != 0){
         if (tester.compare(0, 3, "*n/") == 0) {
             bool reading = true;
@@ -143,19 +135,19 @@ void* task1 (void *dummyPt) {
             int bits = 0;
             int pos = 3;
             int items = 0;
-            const char* key;
-            const char* value;
+            char* key;
+            char* value;
             int value_size = 0;
 
             while (reading) {
                 if (tester.compare(pos, 1, "/") == 0) {
                     if (items == 0) {
-                        key = tester.substr(start, bits).c_str();
+                        key = (char*)tester.substr(start, bits).c_str();
                         start = pos + 1;
                         bits = 0;
                         items++;
                     } else if (items == 1) {
-                        value = tester.substr(start, bits).c_str();
+                        value = (char*)tester.substr(start, bits).c_str();
                         start = pos + 1;
                         bits = 0;
                         items++;
@@ -170,7 +162,21 @@ void* task1 (void *dummyPt) {
                 }
                 pos++;
             }
-            memory.ram.add_end(key,value,value_size);
+
+            cout << key << '/' << value << '/' << value_size << endl;
+
+            if (memory.ram.searchKey(key)){
+                cout << "The key is already in use" << endl;
+            }else if (!memory.ram.searchKey(key)){
+                memory.ram.add_end(key,value,value_size);
+            }
+            else{
+                cout << "ERROR" <<endl;
+            }
+
+            rmRef_h<char*>* temp = memory.ram.get_nodo(key);
+            temp->printValues();
+
             print();
         }else if (tester.compare(0, 3, "*g/") == 0){
 

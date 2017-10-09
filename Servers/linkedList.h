@@ -24,15 +24,15 @@ public:
     rmRef_h<T>* first;
     int size;
 
-    void add_end(const char*,T,int);
+    void add_end(char*,T,int);
 
-    void del_by_data(T);
-
-    void del_by_position(int);
+    void del_by_key(char *);
 
     void print();
 
-    void search(T);
+    bool searchKey(char *);
+
+    rmRef_h<T>* get_nodo(char*);
 };
 
 

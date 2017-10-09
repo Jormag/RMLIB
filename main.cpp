@@ -1,6 +1,7 @@
 #include <iostream>
 //#include "/home/cristian/CLionProjects/RMLIB.h"
 #include "RMLIB.h"
+#include "Servers/rmRef_h.cpp"
 
 using namespace std;
 int main() {
@@ -12,13 +13,13 @@ int main() {
     string value = "";
     void* ptr = &value;
 
+
     init(ip.c_str(), port, ipHA.c_str(), portHA);
 
     cin >> key;
     cin >> value;
 
-    rm_new(key.c_str(),ptr,8);
-
+    rm_new(key.c_str(),ptr,sizeof(value));
 
     return 0;
 }

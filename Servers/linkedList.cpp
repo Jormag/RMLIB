@@ -12,7 +12,7 @@ linkedList<T>::linkedList()
 
 // Insertar al final
 template<typename T>
-void linkedList<T>::add_end(const char* key_,T data_,int data_size_)
+void linkedList<T>::add_end(char* key_,T data_,int data_size_)
 {
     rmRef_h<T>* temp = first;
     rmRef_h<T>* new_node = new rmRef_h<T> ();
@@ -35,18 +35,18 @@ void linkedList<T>::add_end(const char* key_,T data_,int data_size_)
 
 // Eliminar por data del nodo
 template<typename T>
-void linkedList<T>::del_by_data(T data_)
+void linkedList<T>::del_by_key(char *key_)
 {
     rmRef_h<T>* temp = first;
     rmRef_h<T>* temp1 = first->next;
 
     int cont = 0;
 
-    if (first->data == data_) {
+    if (first->key == key_) {
         first = temp->next;
     } else {
         while (temp1) {
-            if (temp1->data == data_) {
+            if (temp1->key == key_) {
                 rmRef_h<T>* aux_node = temp1;
                 temp->next = temp1->next;
                 delete aux_node;
@@ -59,32 +59,7 @@ void linkedList<T>::del_by_data(T data_)
     }
 
     if (cont == 0) {
-        cout << "No existe el dato " << endl;
-    }
-}
-
-// Eliminar por posición del nodo
-template<typename T>
-void linkedList<T>::del_by_position(int pos)
-{
-    rmRef_h<T> *temp = first;
-    rmRef_h<T> *temp1 = temp->next;
-
-    if (pos < 1 || pos > size) {
-        cout << "Fuera de rango " << endl;
-    } else if (pos == 1) {
-        first = temp->next;
-    } else {
-        for (int i = 2; i <= pos; i++) {
-            if (i == pos) {
-                rmRef_h<T> *aux_node = temp1;
-                temp->next = temp1->next;
-                delete aux_node;
-                size--;
-            }
-            temp = temp->next;
-            temp1 = temp1->next;
-        }
+        cout << "The key doesn't exist " << endl;
     }
 }
 
@@ -110,25 +85,43 @@ void linkedList<T>::print()
 
 // Buscar el dato de un nodo
 template<typename T>
-void linkedList<T>::search(T data_)
+bool linkedList<T>::searchKey(char* key_)
 {
-    rmRef_h<T> *temp = first;
-    int cont = 1;
-    int cont2 = 0;
+    rmRef_h<T>* temp = first;
+    bool entry;
+    entry = false;
 
-    while (temp) {
-        if (temp->data == data_) {
-            cout << "El dato se encuentra en la posición: " << cont << endl;
-            cont2++;
+    while (temp!= NULL) {
+
+        if (string(temp->key).compare(string(key_)) == 0){
+            entry = true;
+            temp = temp->next;
         }
-        temp = temp->next;
-        cont++;
+        else{
+            temp = temp->next;
+        }
     }
 
-    if (cont2 == 0) {
-        cout << "No existe el dato " << endl;
+    return entry;
+}
+
+template<typename T>
+rmRef_h<T>* linkedList<T>::get_nodo(char* key_)
+{
+    rmRef_h<T>* temp = first;
+
+    while (temp!= NULL) {
+        if (string(temp->key).compare(string(key_)) == 0){
+            break;
+        }else if (temp->next == NULL){
+            cout << "The key doesn't in use" << endl;
+            temp = temp->next;
+        }
+        else{
+            temp = temp->next;
+        }
     }
-    cout << endl << endl;
+    return temp;
 }
 
 

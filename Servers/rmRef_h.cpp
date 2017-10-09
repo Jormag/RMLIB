@@ -11,14 +11,14 @@ rmRef_h<T>::rmRef_h() {
     data_size = 0;
 }
 
-/*
 template<typename T>
-rmRef_h<T>::rmRef_h(const char* key_,T data_,int data_size_) {
-    key = key_;
-    data = data_;
-    data_size = data_size_;
-    next = NULL;
+void rmRef_h<T>::printValues()
+{
+    cout << "Key " << key << endl;
+    cout << "Data " << data << endl;
+    cout << "Data_size " << data_size << endl;
 }
- */
+
+
 template<typename T>
 rmRef_h<T>::~rmRef_h() {}
