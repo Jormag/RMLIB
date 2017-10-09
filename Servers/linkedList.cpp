@@ -12,12 +12,15 @@ linkedList<T>::linkedList()
 
 // Insertar al final
 template<typename T>
-void linkedList<T>::add_end(T data_)
+void linkedList<T>::add_end(const char* key_,T data_,int data_size_)
 {
-    Node<T> *new_node = new Node<T> (data_);
-    Node<T> *temp = first;
+    rmRef_h<T>* temp = first;
+    rmRef_h<T>* new_node = new rmRef_h<T> ();
+    new_node->data = data_;
+    new_node->key = key_;
+    new_node->data_size = data_size_;
 
-    if (!first) {
+    if (size==0) {
         first = new_node;
     } else {
         while (temp->next != NULL) {
@@ -34,8 +37,8 @@ void linkedList<T>::add_end(T data_)
 template<typename T>
 void linkedList<T>::del_by_data(T data_)
 {
-    Node<T> *temp = first;
-    Node<T> *temp1 = first->next;
+    rmRef_h<T>* temp = first;
+    rmRef_h<T>* temp1 = first->next;
 
     int cont = 0;
 
@@ -44,7 +47,7 @@ void linkedList<T>::del_by_data(T data_)
     } else {
         while (temp1) {
             if (temp1->data == data_) {
-                Node<T> *aux_node = temp1;
+                rmRef_h<T>* aux_node = temp1;
                 temp->next = temp1->next;
                 delete aux_node;
                 cont++;
@@ -64,8 +67,8 @@ void linkedList<T>::del_by_data(T data_)
 template<typename T>
 void linkedList<T>::del_by_position(int pos)
 {
-    Node<T> *temp = first;
-    Node<T> *temp1 = temp->next;
+    rmRef_h<T> *temp = first;
+    rmRef_h<T> *temp1 = temp->next;
 
     if (pos < 1 || pos > size) {
         cout << "Fuera de rango " << endl;
@@ -74,7 +77,7 @@ void linkedList<T>::del_by_position(int pos)
     } else {
         for (int i = 2; i <= pos; i++) {
             if (i == pos) {
-                Node<T> *aux_node = temp1;
+                rmRef_h<T> *aux_node = temp1;
                 temp->next = temp1->next;
                 delete aux_node;
                 size--;
@@ -89,13 +92,16 @@ void linkedList<T>::del_by_position(int pos)
 template<typename T>
 void linkedList<T>::print()
 {
-    Node<T> *temp = first;
-    if (!first) {
+    rmRef_h<T>* temp = first;
+
+    if (first == NULL) {
         cout << "La Lista está vacía " << endl;
     } else {
-        while (temp) {
-            temp->print();
-            if (!temp->next) cout << "NULL";
+        while (temp != NULL) {
+            cout << temp->data << "-> ";
+            if (temp->next == NULL){
+                cout << "NULL";
+            }
             temp = temp->next;
         }
     }
@@ -106,7 +112,7 @@ void linkedList<T>::print()
 template<typename T>
 void linkedList<T>::search(T data_)
 {
-    Node<T> *temp = first;
+    rmRef_h<T> *temp = first;
     int cont = 1;
     int cont2 = 0;
 

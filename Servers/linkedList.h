@@ -9,10 +9,8 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <stdlib.h>
-
-#include "node.h"
-#include "node.cpp"
+#include <cstdlib>
+#include "rmRef_h.cpp"
 
 using namespace std;
 
@@ -23,10 +21,10 @@ public:
 
     ~linkedList();
 
-    Node<T> *first;
+    rmRef_h<T>* first;
     int size;
 
-    void add_end(T);
+    void add_end(const char*,T,int);
 
     void del_by_data(T);
 

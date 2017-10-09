@@ -1,25 +1,24 @@
 #include <iostream>
 //#include "/home/cristian/CLionProjects/RMLIB.h"
 #include "RMLIB.h"
-#include "Servers/Memory.cpp"
 
 using namespace std;
-
 int main() {
-    /*char* parameters[4]= {"192.168.0.39","8080","192.168.0.39","8000"};
+    string ip = "192.168.0.28";
+    string ipHA = "192.168.0.28";
+    int port = 8080, portHA = 8000;;
 
-    init(parameters);
-    sendCommand(rm_new);
-     */
-    Memory<int> memory;
-    memory.ram.add_end(10);
-    memory.ram.add_end(30);
-    memory.ram.add_end(15);
-    memory.ram.print();
+    string key = "";
+    string value = "";
+    void* ptr = &value;
 
-    memory.cache.add_end(1);
-    memory.cache.add_end(3);
-    memory.cache.add_end(5);
-    memory.cache.print();
+    init(ip.c_str(), port, ipHA.c_str(), portHA);
+
+    cin >> key;
+    cin >> value;
+
+    rm_new(key.c_str(),ptr,8);
+
+
     return 0;
 }
