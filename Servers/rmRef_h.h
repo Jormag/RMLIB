@@ -9,7 +9,7 @@
 
 using namespace std;
 
-template <class T>
+
 class rmRef_h {
 public:
     rmRef_h();
@@ -17,9 +17,13 @@ public:
     ~rmRef_h();
 
     rmRef_h* next;
-    T data;
-    const char* key;
+    int data;
+    char* key;
     int data_size;
+
+    bool operator==(const rmRef_h& target);
+    bool operator!=(const rmRef_h& target);
+    rmRef_h& operator=(const rmRef_h& target);
 };
 
 

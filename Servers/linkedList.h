@@ -14,17 +14,17 @@
 
 using namespace std;
 
-template <class T>
 class linkedList {
 public:
     linkedList();
 
     ~linkedList();
 
-    rmRef_h<T>* first;
+    rmRef_h* first;
+
     int size;
 
-    void add_end(char*,T,int);
+    void add_end(char*,int,int);
 
     void del_by_key(char *);
 
@@ -32,7 +32,7 @@ public:
 
     bool searchKey(char *);
 
-    rmRef_h<T>* get_nodo(char*);
+    rmRef_h& get_rmRef(char *);
 };
 
 

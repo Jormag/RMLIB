@@ -7,13 +7,10 @@
 
 #include <iostream>
 #include "linkedList.cpp"
-
-template <class T>
-
 class Memory {
 public:
-    linkedList<T> cache;
-    linkedList<T> ram;
+    linkedList cache;
+    linkedList ram;
 
     Memory();
     ~Memory();

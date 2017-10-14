@@ -12,11 +12,63 @@
 #include <cstdlib>
 #include <arpa/inet.h>
 #include <string>
-#include <iostream>
 #include <sstream>
+
 
 using namespace std;
 
+class rmRef_h{
+public:
+    rmRef_h* next;
+    int data;
+    char* key;
+    int data_size;
+
+    rmRef_h(){
+        key = NULL;
+        data = 0;
+        next = NULL;
+        data_size = 0;
+    }
+
+    void printValues(){
+        cout << "Key " << key << endl;
+        cout << "Data " << data << endl;
+        cout << "Data_size " << data_size << endl;
+    }
+
+    ~rmRef_h();
+
+
+
+    bool operator==(const rmRef_h& target){
+        bool result = false;
+        if (this == &target){
+            if (this->data != target.data){
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    bool operator!=(const rmRef_h& target){
+        bool result = false;
+        if (this != &target){
+            if (this->data != target.data){
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    rmRef_h& operator=(const rmRef_h& target){
+        if (this != &target){
+            data = target.data;
+            data_size =target.data_size;
+        }
+        return *this;
+    }
+};
 
 int ClientSocket=0, portNo, portNoHA;
 const char* ipAdd;
@@ -28,6 +80,8 @@ void closeSocket();
 void sendCommand(string parameters);
 
 struct sockaddr_in ServerAddress;
+
+rmRef_h* getptr = new rmRef_h();
 
 void init (const char* ip, int port, const char* ipHA, int portHA) {
     struct hostent *server,*serverHA;
@@ -117,14 +171,84 @@ void sendCommand(string parameters){
     }
     const char* message = parameters.c_str();
 
-    send(ClientSocket, message, parameters.size(),0);
+    write(ClientSocket,message,parameters.size());
+
     closeSocket();
 }
 
-void rm_new(const char* key,void* value, int value_size){
-    string* intptr = static_cast<string*>(value);
+void rm_new(char* key,void* value, int value_size){
     ostringstream os;
-    os << "*" << "n" <<"/"<< key <<"/" <<*intptr << "/" << value_size << "*" << endl;
+    os << "*" << "n" <<"/"<< key <<"/" <<*(int*)value << "/" << value_size << "*" << endl;
+    sendCommand(os.str());
+}
+
+rmRef_h* rm_get(char* key){
+    ostringstream os;
+    os << "*" << "g" <<"/"<< key << "*" << endl;
+
+    if (!testConnection()){
+        cout << "error" << endl;
+        exit(1);
+    }
+
+    write(ClientSocket, os.str().c_str(), os.str().size());
+
+    char* buff = new char(100);
+    ssize_t readed = read(ClientSocket,buff,100);
+    closeSocket();
+
+    if (readed != -1){
+        string tester(buff);
+
+        if (tester.compare(0, 2, "*/") == 0) {
+            bool reading = true;
+            int start = 2;
+            int bits = 0;
+            int pos = 2;
+            int items = 0;
+            char *key_;
+            int value_ = 0;
+            int value_size_ = 0;
+
+            while (reading) {
+                if (tester.compare(pos, 1, "/") == 0) {
+                    if (items == 0) {
+                        key_ = (char *) tester.substr(start, bits).c_str();
+                        start = pos + 1;
+                        bits = 0;
+                        items++;
+                    } else if (items == 1) {
+                        value_ = atoi(tester.substr(start, bits).c_str());
+                        start = pos + 1;
+                        bits = 0;
+                        items++;
+                    } else {
+                        cout << "to many parameters to assign" << endl;
+                    }
+                } else if (tester.compare(pos, 1, "*") == 0) {
+                    value_size_ = atoi(tester.substr(start, bits).c_str());
+                    reading = false;
+                } else {
+                    bits++;
+                }
+                pos++;
+            }
+
+            getptr->key = key_;
+            getptr->data = value_;
+            getptr->data_size = value_size_;
+        }
+    }else{
+        cout << "can't read" << endl;
+    }
+
+    return getptr;
+
+}
+
+void rm_delete(rmRef_h* handler){
+    ostringstream os;
+    os << "*" << "d" <<"/"<< handler->key << "*" << endl;
     sendCommand(os.str());
 }
 

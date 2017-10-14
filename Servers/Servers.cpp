@@ -5,8 +5,8 @@
 #include <iostream>
 #include <string>
 #include <sys/socket.h>
+#include <sstream>
 #include "Memory.cpp"
-
 
 using namespace std;
 
@@ -15,11 +15,12 @@ void print();
 
 static int ServerSocket;
 const bool active = true;
-Memory<char*> memory;
+Memory memory;
 
 int portNo,portA, portP, ClientSocket, type;
 char* ip;
 bool inUse;
+struct sockaddr_in serverAddress, clientAddress;
 
 
 int main() {
@@ -46,10 +47,10 @@ int main() {
     }
 
     inUse = false;
-    memory = Memory<char*>();
+    memory = Memory();
 
     socklen_t len; //store size of the address
-    struct sockaddr_in serverAddress, clientAddress;
+
 
 
     //Set the thread Number
@@ -98,10 +99,11 @@ int main() {
             cout << "Connection successful" << endl;
         }
 
+        //pthread_t hilo;
         pthread_create(&threadA[noThread], NULL, task1, NULL);
-
+        //pthread_create(&hilo,NULL,task1,NULL);
+        sleep(1);
         noThread++;
-        print();
     }
 
     return 0;
@@ -113,20 +115,20 @@ void print(){
 }
 
 void* task1 (void *dummyPt) {
+    cout << "thread created" <<endl;
+    /*
     if (!inUse){
         inUse = true;
     }else{
         while(inUse){
 
         }
-    }
+    }*/
 
-    cout << "Client Connected" << endl;
-    char test[30] = {0};
-    recv(ServerSocket, test, 30, 0);
-    string tester(test);
+    char* buffer = new char[100];
+    read(ServerSocket, buffer, 100);
 
-    cout << tester << endl;
+    string tester(buffer);
 
     if (tester.size() != 0){
         if (tester.compare(0, 3, "*n/") == 0) {
@@ -136,7 +138,8 @@ void* task1 (void *dummyPt) {
             int pos = 3;
             int items = 0;
             char* key;
-            char* value;
+            //void* value;
+            int value;
             int value_size = 0;
 
             while (reading) {
@@ -147,7 +150,8 @@ void* task1 (void *dummyPt) {
                         bits = 0;
                         items++;
                     } else if (items == 1) {
-                        value = (char*)tester.substr(start, bits).c_str();
+                        //value = (void*)tester.substr(start, bits).c_str();
+                        value = atoi(tester.substr(start, bits).c_str());
                         start = pos + 1;
                         bits = 0;
                         items++;
@@ -163,8 +167,6 @@ void* task1 (void *dummyPt) {
                 pos++;
             }
 
-            cout << key << '/' << value << '/' << value_size << endl;
-
             if (memory.ram.searchKey(key)){
                 cout << "The key is already in use" << endl;
             }else if (!memory.ram.searchKey(key)){
@@ -174,17 +176,70 @@ void* task1 (void *dummyPt) {
                 cout << "ERROR" <<endl;
             }
 
-            rmRef_h<char*>* temp = memory.ram.get_nodo(key);
-            temp->printValues();
-
             print();
         }else if (tester.compare(0, 3, "*g/") == 0){
+            bool reading = true;
+            int start = 3;
+            int bits = 0;
+            int pos = 3;
+            char* key;
 
+            while (reading) {
+                if (tester.compare(pos, 1, "*") == 0) {
+                    key = (char*)tester.substr(start, bits).c_str();
+                    reading = false;
+                }else{
+                    bits++;
+                }
+                pos++;
+            }
+
+            rmRef_h* temp = &memory.ram.get_rmRef(key);
+
+            if (temp != NULL){
+                temp->printValues();
+
+                ostringstream os;
+                os << "*" << "/" << key <<"/" <<temp->data << "/" << temp->data_size << "*" << endl;
+
+                write(ServerSocket,os.str().c_str(),os.str().size());
+                ServerSocket = 0;
+
+            }else{
+                cout <<"/d"<< "the key is not in use" << endl;
+            }
+
+        }else if (tester.compare(0, 3, "*d/") == 0){
+            bool reading = true;
+            int start = 3;
+            int bits = 0;
+            int pos = 3;
+            char* key;
+
+            cout << tester << endl;
+
+            while (reading) {
+                if (tester.compare(pos, 1, "*") == 0) {
+                    key = (char*)tester.substr(start, bits).c_str();
+                    reading = false;
+                }else{
+                    bits++;
+                }
+                pos++;
+            }
+
+            if (memory.ram.searchKey(key)){
+                memory.ram.del_by_key(key);
+            }else if (!memory.ram.searchKey(key)){
+                cout << "The key is not in use" << endl;
+            }
+            else{
+                cout << "ERROR" <<endl;
+            }
         }
-    }else{
-        cout << "Tester Vacio"<<endl;
-    }
 
+    }
+    sleep(1);
     inUse = false;
     cout << "\nClosing thread and conn" << endl;
     pthread_exit(NULL);

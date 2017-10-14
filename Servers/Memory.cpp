@@ -4,10 +4,9 @@
 
 #include "Memory.h"
 // Constructor por defecto
-template<typename T>
-Memory<T>::Memory(){
-    cache = linkedList<T>();
-    ram = linkedList<T>();
+
+Memory::Memory(){
+    cache = linkedList();
+    ram = linkedList();
 }
-template<typename T>
-Memory<T>::~Memory(){}
+Memory::~Memory(){}
